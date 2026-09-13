@@ -1,112 +1,158 @@
-# God Harness
+<div align="center">
 
-Um harness genérico de engenharia para agentes de IA (Claude Code, Codex, Cursor, etc.) trabalharem em qualquer projeto de software com um processo de desenvolvimento seguro e rastreável.
+# 🧠 God Harness
 
-Este repositório **não é um projeto**. Ele é um esqueleto que, na primeira execução, não sabe nada sobre a aplicação que vai construir. O próprio harness pergunta a você o que é o projeto, qual arquitetura, quais tecnologias, quais convenções — e vai gerando os documentos de contexto (`.ai/context/*.md`) conforme você responde. Só depois disso ele libera o fluxo de desenvolvimento.
+**Um esqueleto de engenharia para agentes de IA — que começa vazio e aprende o seu projeto perguntando.**
 
-## Como começar
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+[![AGENTS.md](https://img.shields.io/badge/spec-AGENTS.md-blue)](https://agents.md)
+[![Idioma](https://img.shields.io/badge/idioma-PT--BR-green)](#)
+[![Compatível](https://img.shields.io/badge/compat%C3%ADvel-Claude%20Code%20%7C%20Codex%20%7C%20Cursor-6e5494)](#)
 
-1. Copie esta pasta para o repositório do seu novo projeto (ou use este repositório como template).
-2. Abra o projeto com seu agente de IA (Claude Code, Codex CLI, etc.).
-3. Peça para o agente ler `AGENTS.md`. Como `.ai/context/business.md` e `.ai/context/architecture.md` ainda estão com o placeholder de bootstrap, o agente vai automaticamente rodar a skill `$bootstrap-project` e te entrevistar.
-4. Responda às perguntas em rodadas. Ao final, o harness gera/atualiza:
-   - `.ai/context/business.md`
-   - `.ai/context/architecture.md`
-   - `.ai/context/coding-standards.md`
-   - `.ai/context/testing-standards.md`
-   - `.ai/context/project-status.md` (marca o bootstrap como concluído)
-5. A partir daí, toda solicitação de trabalho passa pelo fluxo descrito em `AGENTS.md`, coordenado pela skill `$orchestrator`.
+</div>
 
-## O que tem aqui
+---
+
+## O problema
+
+Toda vez que você começa um projeto novo com um agente de IA, a mesma conversa se repete: explicar a stack, as convenções, onde ficam as regras de negócio, como rodar os testes — e depois torcer para que o agente não esqueça nada disso na entrega seguinte, não invente arquitetura, não pule teste, não misture duas mudanças na mesma entrega.
+
+**God Harness** resolve isso de um jeito diferente: em vez de você escrever a documentação de contexto manualmente, o próprio harness te entrevista na primeira execução e gera essa documentação. E, a partir daí, todo pedido de funcionalidade ou correção passa por um processo fixo — entendimento → intenção → requisitos → análise de impacto → revisões → implementação → testes → validação — em vez de o agente sair editando código direto a partir de uma frase solta.
+
+## Como funciona
+
+```mermaid
+flowchart TD
+    A["📦 Copiar o harness<br/>para um projeto novo"] --> B{".ai/context/*.md<br/>já preenchido?"}
+    B -- "não (balão vazio)" --> C["🎤 $bootstrap-project<br/>entrevista em rodadas"]
+    C --> D["Gera business.md, architecture.md,<br/>coding-standards.md, testing-standards.md"]
+    D --> E["✅ project-status.md → bootstrap: done"]
+    B -- "sim" --> E
+    E --> F["🧭 $orchestrator coordena<br/>toda entrega nova"]
+    F --> G["Intent → PRD → Impact Analysis<br/>→ Reviews → Implementação → Testes<br/>→ Reintegração → Validation Report"]
+```
+
+Nenhuma outra skill roda antes do bootstrap. É a "Regra Zero" de `AGENTS.md`: se `.ai/context/project-status.md` disser `bootstrap: pending`, o agente só pode fazer uma coisa — rodar `$bootstrap-project`.
+
+## Quickstart
+
+```bash
+# 1. copie o harness para dentro do repositório do projeto novo
+cp -r god_harness/. meu-projeto-novo/
+
+# 2. abra meu-projeto-novo com seu agente de IA (Claude Code, Codex CLI, Cursor...)
+cd meu-projeto-novo
+
+# 3. peça para o agente ler o AGENTS.md
+```
+
+> "Leia o AGENTS.md e siga o processo dele."
+
+Como o projeto ainda não tem contexto, o agente vai automaticamente acionar `$bootstrap-project` e te entrevistar em rodadas — negócio, arquitetura, stack, padrões de código, testes e como você quer que o fluxo funcione. No final ele te mostra um resumo e só escreve os arquivos depois da sua confirmação.
+
+Depois disso, para qualquer pedido novo, basta descrever o que você quer. O `$orchestrator` cuida do resto.
+
+## Estrutura
 
 ```text
-AGENTS.md                  # regra zero: todo agente lê isso antes de qualquer coisa
+AGENTS.md                      # regra zero — todo agente lê isso antes de qualquer coisa
+CLAUDE.md                      # ponteiro para AGENTS.md (compat. Claude Code)
+
 .ai/
-├── context/                # a "memória" do projeto (gerada pelo bootstrap)
-│   ├── business.md
-│   ├── architecture.md
-│   ├── coding-standards.md
-│   ├── testing-standards.md
-│   └── project-status.md
-└── templates/               # templates oficiais de documentos
+├── context/                   # a "memória" do projeto — gerada pelo bootstrap
+│   ├── project-status.md      #   estado do bootstrap (pending | in_progress | done)
+│   ├── business.md            #   negócio, usuários, indicadores
+│   ├── architecture.md        #   módulos, stack, convenções
+│   ├── coding-standards.md    #   padrões de código (base genérica + específicos)
+│   └── testing-standards.md   #   padrões de teste (base genérica + específicos)
+└── templates/                 # templates oficiais dos documentos de cada etapa
     ├── intent_template.md
     ├── prd_template.md
     ├── impact_analysis_template.md
     ├── test_plan_template.md
     ├── validation_report_template.md
     └── adr_template.md
-.agents/
-└── skills/                  # skills invocáveis pelo agente ($nome-da-skill)
-    ├── bootstrap-project/   # entrevista inicial, cria o contexto do zero
-    ├── orchestrator/        # coordena o fluxo completo ponta a ponta
-    ├── grill-me/            # entrevista relâmpago para pedidos não técnicos (Matt Pocock)
-    ├── grilling/            # motor de entrevista em rodadas (Matt Pocock)
-    ├── domain-modeling/     # glossário de domínio + ADRs leves (Matt Pocock)
-    ├── to-tickets/          # quebra em tickets verticais (Matt Pocock)
-    ├── resolving-merge-conflicts/ # resolução de conflitos de merge (Matt Pocock)
-    ├── create-intent/
-    ├── create-prd/
-    ├── impact-analysis/
-    ├── architecture-review/
-    ├── business-review/
-    ├── security-review/
-    ├── observability-review/
-    ├── generate-tests/
-    ├── implementation-review/
-    ├── validate-delivery/
-    └── reintegrar-main/
-docs/adr/                   # Architecture Decision Records
-intent/                     # Intents, PRDs, análises e relatórios de cada entrega
-scripts/
-└── governance-audit.sh      # audita a consistência da governança do repo
+
+.agents/skills/                # skills invocáveis pelo agente ($nome-da-skill)
+├── bootstrap-project/         # entrevista inicial — cria o contexto do zero
+├── orchestrator/              # coordena o fluxo completo ponta a ponta
+├── create-intent/  create-prd/  impact-analysis/
+├── architecture-review/  business-review/
+├── security-review/  observability-review/
+├── generate-tests/  implementation-review/  validate-delivery/
+├── reintegrar-main/
+└── (skills de Matt Pocock — ver abaixo)
+
+docs/adr/                      # Architecture Decision Records + índice
+intent/                        # Intent, PRD, análises e relatórios de cada entrega
+scripts/governance-audit.sh    # audita a consistência da governança do repo
 ```
+
+## O fluxo, ponta a ponta
+
+```mermaid
+flowchart LR
+    I["💡 Ideia"] --> U["🗣️ Entendimento<br/>$grilling / $grill-me"]
+    U --> INT["📄 Intent<br/>$create-intent"]
+    INT --> PRD["📋 PRD<br/>$create-prd"]
+    PRD --> IA["🔍 Impact Analysis<br/>$impact-analysis"]
+    IA --> AR["🏛️ Architecture Review"]
+    AR --> BR["💰 Business Review"]
+    BR --> TK["🎫 Tickets<br/>$to-tickets (se necessário)"]
+    TK --> IMPL["⚙️ Implementação"]
+    IMPL --> T["🧪 Testes<br/>$generate-tests"]
+    T --> REV["👀 Implementation /<br/>Security / Observability Review"]
+    REV --> MAIN["🔀 Reintegração na main<br/>$reintegrar-main"]
+    MAIN --> VAL["✅ Validation Report<br/>$validate-delivery"]
+    VAL --> D["🚀 Entrega"]
+```
+
+Para bugs pequenos e correções de baixo risco, `$orchestrator` define uma **matriz de decisão** com um caminho simplificado (Intent leve → PRD leve → implementação → testes → validação) — o rigor é proporcional ao risco, não burocracia por burocracia.
 
 ## Filosofia
 
-O processo é o mesmo para qualquer stack: o que muda é o conteúdo de `.ai/context/*.md`, preenchido uma vez pelo bootstrap e evoluído ao longo do projeto (por você ou pelas skills de revisão). As skills em si não sabem se o projeto é Java, Node, Python, Rust, Flutter ou o que for — elas leem o contexto para saber.
+O processo é o mesmo para qualquer stack — Java, Node, Python, Rust, Flutter, o que for. O que muda é só o conteúdo de `.ai/context/*.md`, preenchido uma vez pelo bootstrap e evoluído ao longo do projeto (por você ou pelas próprias skills de revisão). As skills não sabem qual é a sua stack; elas leem o contexto para descobrir.
 
-Fluxo obrigatório de qualquer entrega, do menor bugfix à maior funcionalidade:
+Alguns princípios que o harness impõe em `AGENTS.md`:
 
-```text
-IDEIA
-  ↓
-ENTENDIMENTO ($grilling / $grill-me)
-  ↓
-INTENT ($create-intent)
-  ↓
-PRD ($create-prd)
-  ↓
-IMPACT ANALYSIS ($impact-analysis)
-  ↓
-ARCHITECTURE REVIEW ($architecture-review)
-  ↓
-BUSINESS REVIEW ($business-review)
-  ↓
-TICKETS, quando a entrega exigir mais de uma integração segura na main ($to-tickets)
-  ↓
-IMPLEMENTAÇÃO
-  ↓
-TESTES ($generate-tests)
-  ↓
-IMPLEMENTATION REVIEW ($implementation-review)
-  ↓
-SECURITY REVIEW ($security-review)
-  ↓
-OBSERVABILITY REVIEW ($observability-review)
-  ↓
-REINTEGRAÇÃO NA MAIN ($reintegrar-main)
-  ↓
-VALIDAÇÃO PRD × ENTREGA ($validate-delivery)
-  ↓
-ENTREGA
-```
+* **Intent → PRD → Código.** Nessa ordem de verdade. O código existente nunca justifica violar uma regra documentada.
+* **Isolamento de contexto.** Cada Intent é uma frente isolada — nunca misture duas mudanças na mesma entrega.
+* **Nada de "deve funcionar".** Testes são executados de verdade, com evidência, antes de qualquer entrega ser considerada concluída.
+* **Segurança e isolamento multi-tenant não são opcionais** quando o projeto exige — são checklist obrigatório em `$security-review`.
+* **Credenciais existentes nunca são removidas ou mascaradas** por suposição de que "devem estar em outro lugar".
 
-Para correções pequenas e operacionais, `AGENTS.md` define uma matriz de decisão que permite um fluxo simplificado — o rigor é proporcional ao risco, não burocracia por burocracia.
+## Skills incluídas
+
+| Skill | O que faz |
+|---|---|
+| `$bootstrap-project` | Entrevista inicial — transforma o balão vazio no contexto real do projeto |
+| `$orchestrator` | Coordena o fluxo completo, do entendimento à validação final |
+| `$grill-me` / `$grilling` † | Entrevista relâmpago em rodadas para qualquer decisão a esclarecer |
+| `$domain-modeling` † | Glossário de domínio (`CONTEXT.md`) e ADRs leves |
+| `$to-tickets` † | Quebra uma entrega grande em tickets verticais com bloqueios explícitos |
+| `$resolving-merge-conflicts` † | Resolve conflitos de merge preservando a intenção de cada lado |
+| `$create-intent` | Transforma um pedido bruto em um problema bem definido |
+| `$create-prd` | Transforma a Intent em requisitos testáveis |
+| `$impact-analysis` | Mapeia o que pode quebrar antes de implementar |
+| `$architecture-review` | Garante aderência à arquitetura existente |
+| `$business-review` | Garante que a solução gera valor real |
+| `$security-review` | Autenticação, autorização, isolamento, segredos |
+| `$observability-review` | Logs, métricas, capacidade de diagnóstico em produção |
+| `$generate-tests` | Plano de testes unitários, integração, E2E e regressão |
+| `$implementation-review` | Qualidade técnica do código entregue |
+| `$reintegrar-main` | Reintegra a entrega na `main` e publica em `origin/main` |
+| `$validate-delivery` | Confronta PRD × código entregue, item por item |
+
+† Skills públicas de [Matt Pocock](https://github.com/mattpocock/skills), incluídas quase verbatim.
+
+## Compatibilidade
+
+O harness usa [`AGENTS.md`](https://agents.md) como convenção — funciona com qualquer agente que leia esse arquivo (Claude Code, Codex CLI, Cursor, etc.). Um `CLAUDE.md` mínimo aponta para `AGENTS.md`, para ferramentas que procuram especificamente por esse nome.
 
 ## Créditos
 
-Este harness é baseado no processo de governança usado no ecossistema BJJ Control, generalizado para qualquer projeto, e incorpora as skills públicas de [Matt Pocock](https://github.com/mattpocock/skills) (`grill-me`, `grilling`, `domain-modeling`, `to-tickets`, `resolving-merge-conflicts`).
+Baseado no processo de governança usado no ecossistema [BJJ Control](https://bjjcontrol.com.br), generalizado para qualquer projeto, e incorporando as skills públicas de [Matt Pocock](https://github.com/mattpocock/skills).
 
 ## Licença
 
-Use, copie, adapte. Sem garantias.
+[MIT](./LICENSE) — use, copie, adapte, redistribua. Sem garantias.
