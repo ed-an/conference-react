@@ -48,7 +48,14 @@ Na primeira execução ele não conhece nada sobre a aplicação — isso é res
 <!-- BOOTSTRAP:PROJECT-STRUCTURE -->
 ### Estrutura do Projeto
 
-*(preenchido pelo `$bootstrap-project` com a lista real de módulos/repositórios e o papel de cada um — ver `.ai/context/architecture.md` para o detalhamento completo)*
+Este é um repositório único com os seguintes módulos lógicos:
+
+* **Aplicação web na raiz:** frontend estático da React Conference, construído com React, TypeScript, Vite e Tailwind CSS e publicado no GitHub Pages.
+* **`src/`:** código da aplicação, organizado em `components`, `data`, `assets` e `pages` quando inicializado.
+* **`.agents/`, `.ai/`, `intent/` e `docs/adr/`:** governança, contexto, requisitos, análises, reviews e decisões arquiteturais; não fazem parte do bundle da aplicação.
+* **`docs/references/`:** referências fornecidas para orientar a implementação, incluindo `layout.png`.
+
+Não há backend, banco de dados, área administrativa ou multi-tenancy. Ver `.ai/context/architecture.md` para o detalhamento completo.
 <!-- /BOOTSTRAP:PROJECT-STRUCTURE -->
 
 ---
@@ -193,7 +200,12 @@ A sincronização inicial não substitui a reintegração final (`$reintegrar-ma
 <!-- BOOTSTRAP:FLOW-CONFIG -->
 ## Configuração do Fluxo
 
-*(preenchido pelo `$bootstrap-project`: modo padrão — fluxo completo vs. simplificado por tipo de mudança —, rastreador de tickets configurado para `$to-tickets` (arquivos locais ou tracker real), convenção de branch/merge na main, e qualquer regra específica sobre versionamento de credenciais.)*
+* **Modo padrão:** fluxo completo para funcionalidades novas e mudanças arquiteturais; fluxo simplificado, definido pela Matriz de Decisão do `$orchestrator`, para bugs pequenos e correções de baixo risco.
+* **Tickets:** arquivos locais em `.scratch/`, usados quando a entrega exigir mais de uma integração segura na `main`.
+* **Branches:** `feature/<slug>` para funcionalidades e `fix/<slug>` para correções.
+* **Integração:** validar antes de integrar à `main`; push direto é permitido e pull request não é obrigatório.
+* **Publicação:** GitHub Actions publica automaticamente no GitHub Pages após alterações integradas à `main`.
+* **Credenciais:** não versionar novos segredos; quando necessários, usar GitHub Secrets. Credenciais existentes continuam protegidas pela Regra de Alteração de Credenciais deste documento e nunca podem ser removidas ou modificadas automaticamente.
 <!-- /BOOTSTRAP:FLOW-CONFIG -->
 
 ---

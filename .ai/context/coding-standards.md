@@ -158,6 +158,38 @@ Sempre preferir código simples funcionando a código sofisticado difícil de ma
 
 ## Convenções Específicas do Projeto
 
-> Preenchido pelo `$bootstrap-project` na primeira execução e evoluído por ADRs. Enquanto estiver vazio, o bootstrap ainda não rodou ou ainda não coletou esta parte.
+### Stack e dependências
 
-*(vazio — aguardando bootstrap)*
+- Usar React, TypeScript, Vite e Tailwind CSS.
+- Usar npm e manter o `package-lock.json` versionado.
+- Antes de adicionar uma biblioteca, verificar se React, Vite, Tailwind CSS ou uma implementação local pequena já resolvem o problema.
+- Toda dependência nova deve ter propósito documentável, manutenção ativa e impacto aceitável no bundle e na superfície de segurança.
+
+### Organização
+
+- Componentes React usam `PascalCase` e um componente principal por arquivo.
+- Código e identificadores TypeScript usam `camelCase`, exceto tipos e componentes, que usam `PascalCase`.
+- Organizar a aplicação em `src/components`, `src/data`, `src/assets` e `src/pages`.
+- Manter o conteúdo tipado do evento em `src/data`, separado da apresentação.
+- Componentes devem receber dados por propriedades sempre que isso melhorar reuso e testabilidade.
+- Centralizar tokens visuais na configuração/tema do Tailwind CSS ou na estratégia de tokens compatível com a versão adotada.
+
+### Arquitetura
+
+- A aplicação é um frontend estático; não introduzir backend, banco, autenticação ou área administrativa sem nova decisão arquitetural.
+- O link de inscrição é externo e não deve ser tratado como integração de API.
+- Não há multi-tenancy.
+- Não há ferramenta de migration porque o projeto não possui banco de dados.
+
+### Conteúdo e ativos
+
+- A fonte de verdade visual inicial é `docs/references/layout.png`.
+- Usar placeholders para os palestrantes; não pressupor a existência de fotografias.
+- Manter todo texto de interface em português enquanto não houver decisão formal de internacionalização.
+
+### Qualidade
+
+- Evitar `any`; quando inevitável, justificar localmente e restringir seu alcance.
+- Preservar tipagem estrita do TypeScript.
+- Não ignorar warnings do build, lint ou testes.
+- Toda mudança de comportamento deve acompanhar testes proporcionais definidos em `.ai/context/testing-standards.md`.

@@ -1,31 +1,65 @@
----
-gerado por: $bootstrap-project
-status: aguardando bootstrap
----
+# Arquitetura do Projeto
 
-# ⚠️ Arquitetura Não Definida
+## Visão Geral
 
-Este arquivo ainda não foi preenchido.
+React Conference é uma aplicação frontend estática de página única, mantida em um único repositório. A aplicação apresenta o conteúdo da conferência e redireciona o usuário para uma plataforma externa de inscrição.
 
-Este repositório é um **harness vazio**: ele ainda não conhece a arquitetura, os repositórios/módulos, nem a stack tecnológica do projeto.
+## Estrutura do Repositório
 
-## Ação Obrigatória
+### Aplicação web — raiz do repositório
 
-Antes de qualquer Intent, PRD, implementação ou análise, o agente deve executar:
+- **Responsabilidade:** renderizar o site público da conferência.
+- **Linguagem:** TypeScript.
+- **Framework e build:** React com Vite.
+- **Estilos:** Tailwind CSS, organizado por componentes e tokens visuais.
+- **Gerenciador de dependências:** npm.
+- **Hospedagem:** GitHub Pages.
+- **Publicação:** GitHub Actions após alterações integradas à `main`.
+
+### Governança — `.agents/`, `.ai/`, `intent/` e `docs/adr/`
+
+- **Responsabilidade:** manter skills, contexto oficial, documentação de requisitos, análises, reviews e decisões arquiteturais.
+- Esses diretórios não fazem parte do bundle publicado da aplicação.
+
+### Referências — `docs/references/`
+
+- **Responsabilidade:** armazenar referências fornecidas para orientar a implementação.
+- `docs/references/layout.png` é a referência visual inicial do site.
+
+## Organização Planejada da Aplicação
 
 ```text
-$bootstrap-project
+src/
+├── assets/       # ativos visuais usados pela aplicação
+├── components/   # componentes React reutilizáveis
+├── data/         # conteúdo tipado do evento
+└── pages/        # composição das páginas
 ```
 
-Essa skill vai entrevistar o usuário para entender:
+O conteúdo do evento deve permanecer separado dos componentes de apresentação. Componentes React usam `PascalCase`, com um componente principal por arquivo.
 
-* quais são os projetos/módulos/repositórios envolvidos
-* qual stack cada um usa (linguagem, framework, banco de dados, infraestrutura)
-* como eles se comunicam entre si
-* convenções de nomenclatura e estrutura de pastas
-* onde rodar build, testes e ambiente local
-* particularidades relevantes (multi-tenancy, monorepo vs polyrepo, mobile, etc.)
+## Comunicação e Dependências Externas
 
-e então reescrever este arquivo com o conteúdo real, seguindo a estrutura descrita em `.agents/skills/bootstrap-project/SKILL.md`.
+- Não existe comunicação entre módulos internos independentes; há apenas uma aplicação frontend.
+- O fluxo de inscrição é uma navegação externa para `www.register.com.br/evento/14527`.
+- A aplicação não consulta nem exibe a quantidade de inscritos.
+- Não há API própria, backend, banco de dados, fila ou processamento de pagamento.
 
-Nenhum agente deve inventar arquitetura para preencher este arquivo. Se este arquivo ainda contém este aviso, o bootstrap não foi concluído.
+## Multi-tenancy e Dados
+
+O projeto **não é multi-tenant**. Não há persistência própria nem dados de usuários no escopo atual.
+
+## Interface e Responsividade
+
+- A interface deve seguir `docs/references/layout.png`: cabeçalho, navegação, banner principal com chamada para ingresso e grade de oito palestrantes.
+- O layout deve ser responsivo.
+- Fotografias de palestrantes não fazem parte do escopo; devem ser usados placeholders.
+- Não há requisito declarado de suporte a navegadores legados.
+
+## Compatibilidade e Evolução
+
+O produto é greenfield e não possui clientes legados ou contratos de API a preservar. Mudanças futuras que introduzam backend, banco de dados, autenticação, administração de conteúdo ou integração com a plataforma de ingressos alteram a arquitetura e exigem fluxo completo e, quando aplicável, ADR.
+
+## Critério de Escolha de Módulo
+
+No escopo atual há um único módulo executável: toda mudança de interface ou conteúdo pertence à aplicação web na raiz. Documentos de requisitos e decisões pertencem aos diretórios de governança correspondentes; referências visuais pertencem a `docs/references/`.

@@ -106,13 +106,44 @@ Código sem teste é hipótese. Código validado por testes é evidência. Somen
 
 ## Configuração Específica do Projeto
 
-> Preenchido pelo `$bootstrap-project` na primeira execução. Deve conter, no mínimo:
->
-> * Framework(s) de teste unitário/integração usados
-> * Framework de E2E (se houver) e como rodá-lo
-> * Comando de build (ex.: `npm run build`, `./gradlew build`, `cargo build`)
-> * Como subir o ambiente local para testes manuais/E2E
-> * Banco de dados autorizado para testes de integração, se aplicável, e a regra de que nenhum teste pode rodar contra produção/homologação/qualquer outro banco
-> * Cobertura mínima esperada, se o time definir uma
+### Ferramentas
 
-*(vazio — aguardando bootstrap)*
+- Testes unitários e de componentes: Vitest + React Testing Library.
+- Testes E2E: Playwright.
+- O projeto não possui banco de dados nem testes de integração com banco.
+
+### Scripts obrigatórios do projeto
+
+Quando a aplicação for inicializada, o `package.json` deve expor, no mínimo:
+
+- `npm run dev` — iniciar o Vite em ambiente local (porta padrão 5173, salvo conflito documentado).
+- `npm run build` — executar checagem necessária e gerar o bundle de produção.
+- `npm test` — executar a suíte unitária/de componentes.
+- `npm run test:coverage` — executar testes com relatório de cobertura.
+- `npm run test:e2e` — executar a suíte Playwright.
+
+### Cobertura
+
+O limite mínimo é de **80%** para cada métrica: statements, branches, functions e lines. O comando de cobertura e a CI devem falhar quando qualquer limite não for atingido.
+
+### Ambiente local e E2E
+
+1. Instalar dependências com `npm ci` quando houver lockfile.
+2. Validar o build com `npm run build`.
+3. Iniciar a aplicação local com `npm run dev` ou usar o `webServer` configurado no Playwright.
+4. Executar `npm run test:e2e` contra o ambiente local, nunca contra a publicação de produção.
+5. Encerrar o servidor local após a execução quando ele não for gerenciado automaticamente.
+
+### Cenários mínimos do site
+
+- Renderização das informações essenciais do evento.
+- Renderização dos oito palestrantes e seus placeholders.
+- Navegação e redirecionamento externo do botão de ingresso.
+- Comportamento responsivo básico em viewport móvel e desktop.
+- Cenários de regressão para estrutura visual e conteúdo alterados.
+
+### Evidências
+
+- Preservar a saída de build, testes e cobertura na Validation Report.
+- Configurar o Playwright para produzir evidência de falha adequada, como screenshot, trace ou vídeo.
+- A publicação no GitHub Pages não substitui validação local nem testes automatizados.
