@@ -3,6 +3,7 @@ import { expect, test } from '@playwright/test'
 test('presents the full conference journey without horizontal overflow', async ({ page }, testInfo) => {
   await page.goto('./')
 
+  await expect(page).toHaveTitle('Pagina de teste — React Conference — 12 de dezembro de 2026')
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Ideias que movem a web.')
   await expect(page.getByText('12 de dezembro de 2026').first()).toBeVisible()
   await expect(page.locator('#palestrantes article')).toHaveCount(8)
