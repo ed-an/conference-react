@@ -34,6 +34,8 @@ tmp/
 # Cobertura de testes
 coverage/
 .nyc_output/
+playwright-report/
+test-results/
 
 # Cache de skills
 .agents/skills/**/scripts/__pycache__/
